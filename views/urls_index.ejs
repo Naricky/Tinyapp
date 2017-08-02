@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body style="font-size:20px; padding:50px;">
+  <header>
+    <% include ./partials/_header %>
+  </header>
+
+<ul>
+ <h3>List of Urls:</h3>
+ <% for (url in urls) { %>
+   <li><%= url %> -<a href=<%= urls[url] %>><%= urls[url] %></a></li>
+   <form method="POST" action=/urls/<%= url %>/delete><button type="delete">Delete</button></form>
+ <% } %>
+</ul>
+
+</body>
+</html>
+
+
