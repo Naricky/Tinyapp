@@ -9,8 +9,10 @@
 <ul>
  <h3>List of Urls:</h3>
  <% for (url in urls) { %>
-   <li><%= url %> -<a href=<%= urls[url] %>><%= urls[url] %></a></li>
+   <li><%= url %> -<a href=<%= urls[url] %>><%= urls[url] %></a>
    <form method="POST" action=/urls/<%= url %>/delete><button type="delete">Delete</button></form>
+   <a href = "/urls/<%= url %>">Edit</a>
+  </li>
  <% } %>
 </ul>
 
