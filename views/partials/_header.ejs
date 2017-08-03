@@ -1,0 +1,15 @@
+<h1> WEBSITE URL -  </h1>
+<% if (username) { %>
+
+<form method="POST" action=/logout>
+<button type="delete" >Logout</button></form>
+<h2> <%= username %> </h2>
+<% } else { %>
+
+<form method="POST" action=/login>
+<label for="username">Username here</label>
+      <input id="username" type="text" name="username" placeholder="name=username" style="width: 300px">
+      <input type="submit" value="Submit">
+</form>
+<% } %>
+<!-- <h2> <%= username %> </h2> -->

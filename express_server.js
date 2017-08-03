@@ -23,30 +23,41 @@ function generateRandomString() {
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
+var cookieParser = require('cookie-parser');
+app.use(cookieParser());
+
 app.set("view engine", "ejs");
 
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase, username:req.cookies["username"]};
   res.render("urls_index", templateVars);
 });
 
-  app.get("/urls/new", (req, res) => {      // provides a space to type in link
-  res.render("urls_new");
+app.get("/urls/new", (req, res) => {
+  let templateVars = { username: req.cookies["username"]
+};
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
   var itemToLookup = req.params.id;
-  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[itemToLookup] };
+  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[itemToLookup], username:req.cookies["username"] };
   res.render("urls_show", templateVars);
 });
 
 app.get("/", (req, res) => {
-  res.end("Hello!");
+  let templateVars = {
+  username: req.cookies["username"],
+};
+  res.end("Hello!", templateVars);
 });
 
 app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+  let templateVars = {
+  username: req.cookies["username"],
+};
+  res.json(urlDatabase, templateVars);
 });
 
 app.post("/urls", (req, res) => {
@@ -71,19 +82,44 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls")
 });
 
+app.post("/logout", (req, res) => {
+
+  res.clearCookie("username")
+
+res.redirect("/urls")
+
+});
+
+app.post("/login", (req, res) => {
+
+res.cookie( "username" , req.body.username );
+
+res.redirect("/urls")
+
+});
+
 app.get("/u/:shortURL", (req, res) => {
+  let templateVars = {
+  username: req.cookies["username"],
+  // ... any other vars
+};
 
   let longURL = urlDatabase[req.params.shortURL]
 
-  res.redirect(longURL);
+  res.redirect(longURL, templateVars);
 });
 
 
 app.get("/hello", (req, res) => {
+  let templateVars = {
+  username: req.cookies["username"],
+  // ... any other vars
+};
   res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 app.listen(PORT, () => {
+
   console.log(`Example app listening on port ${PORT}!`);
 });
 
