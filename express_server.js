@@ -7,6 +7,19 @@ var urlDatabase = {
  "9sm5xK": "http://www.google.com"
 };
 
+const users ={
+  "userRandomID": {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: "purple-monkey-dinosaur"
+  },
+ "user2RandomID": {
+    id: "user2RandomID",
+    email: "user2@example.com",
+    password: "dishwasher-funk"
+  }
+}
+
 function generateRandomString() {
 
   var text = "";
@@ -57,7 +70,14 @@ app.get("/urls.json", (req, res) => {
   let templateVars = {
   username: req.cookies["username"],
 };
-  res.json(urlDatabase, templateVars);
+  res.json(urlDatabase);
+});
+
+app.get("/register", (req, res) => {
+
+
+
+  res.render("registration")
 });
 
 app.post("/urls", (req, res) => {
@@ -90,6 +110,39 @@ res.redirect("/urls")
 
 });
 
+const CheckEmail = (email) => {
+  for (let userId in users) {
+    if(users[userId].email === email){
+      return true
+    }
+  }
+}
+
+
+
+
+app.post("/register", (req,res) => {
+  const { email, password} = req.body;
+  const randStr = generateRandomString();
+
+  if ((email === "") || (password === "" || CheckEmail(email))){
+      res.sendStatus(400)
+  } else {
+    users[randStr] = {
+      id: randStr,
+      email: req.body.email,
+      password: req.body.password
+  }
+}
+console.log(users)
+
+res.cookie("user_id" , users[randStr].id);
+
+res.redirect("/urls")
+
+});
+
+
 app.post("/login", (req, res) => {
 
 res.cookie( "username" , req.body.username );
@@ -101,7 +154,7 @@ res.redirect("/urls")
 app.get("/u/:shortURL", (req, res) => {
   let templateVars = {
   username: req.cookies["username"],
-  // ... any other vars
+
 };
 
   let longURL = urlDatabase[req.params.shortURL]
