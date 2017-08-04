@@ -3,10 +3,15 @@ var app = express();
 var PORT = process.env.PORT || 8080;
 
 var urlDatabase = {
- "b2xVn2": "http://www.lighthouselabs.ca",
- "9sm5xK": "http://www.google.com"
-};
-
+ "b2xVn2": {
+    address: "http://www.lighthouselabs.ca",
+    shortURL: "userRandomID"
+  },
+ "9sm5xK": {
+    address: "http://www.google.com",
+    shortURL: "user2RandomID"
+  }
+}
 const users ={
   "userRandomID": {
     id: "userRandomID",
@@ -49,9 +54,14 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  let templateVars = { user:users[req.cookies["user_id"]]
-};
-  res.render("urls_new", templateVars);
+
+  let templateVars = { user:users[req.cookies["user_id"]] }
+  if (users.hasOwnProperty(req.cookies["user_id"])){
+    res.render("urls_new", templateVars);
+  }
+  else {
+    res.redirect("/login")
+  }
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -82,7 +92,8 @@ app.get("/register", (req, res) => {
 app.post("/urls", (req, res) => {
 
   var shortUrl = generateRandomString();
-  urlDatabase[shortUrl] = req.body.longURL;
+  urlDatabase[shortUrl] = {address:req.body.longURL,
+                          shortURL: shortUrl}
   res.redirect('/urls');
 
 });
@@ -96,8 +107,12 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
 
-  urlDatabase[req.params.id] = req.body.longURL
+  // if ( urlDatabase[req.params.id] = users.user2RandomID)
 
+
+  // else {
+  // urlDatabase[req.params.id] = req.body.longURL
+  // }
   res.redirect("/urls")
 });
 
@@ -195,4 +210,3 @@ app.listen(PORT, () => {
 
   console.log(`Example app listening on port ${PORT}!`);
 });
-
