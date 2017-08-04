@@ -49,10 +49,25 @@ app.use(cookieParser());
 app.set("view engine", "ejs");
 
 
+function urlsForUserID(id){
+  var urlUser = {}
+  for ( var url_id in urlDatabase){
+    if ( urlDatabase[url_id].userID === id)
+      urlUser[url_id] = urlDatabase[url_id];
+    }
+  return urlUser;
+}
+
 app.get("/urls", (req, res) => {
-  console.log('req.cookies', req.cookies);
-  let templateVars = { urls: urlDatabase, user: users[req.cookies["user_id"]]};
-  res.render("urls_index", templateVars);
+ const userCookie = req.cookies['user_id'];
+ var urls = urlsForUserID(userCookie)
+ let templateVars = {
+   urls: urls,
+   user: users[userCookie]
+ };
+ // console.log(userCookie);
+ console.log(urlsForUserID(req.cookies['user_id']))
+ res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
@@ -171,10 +186,6 @@ const findUser = email => {
   }
 }
 
-// const checkPassword = (actualPassword, formPassword) => {
-
-// }
-
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const user = findUser(email, password);
@@ -194,21 +205,15 @@ app.post("/login", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  let templateVars = {
-  user:users[req.cookies["user_id"]],
 
-};
+  let longURL = urlDatabase[req.params.shortURL].address
 
-  let longURL = urlDatabase[req.params.shortURL]
-
-  res.redirect(longURL, templateVars);
+  res.redirect(longURL);
 });
 
 
 app.get("/hello", (req, res) => {
-  let templateVars = {
 
-};
   res.end("<html><body>Hello <b>World</b></body></html>\n");
 });
 
