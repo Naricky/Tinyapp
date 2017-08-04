@@ -107,12 +107,8 @@ app.post("/urls/:id/delete", (req, res) => {
 
 app.post("/urls/:id", (req, res) => {
 
-  // if ( urlDatabase[req.params.id] = users.user2RandomID)
+  urlDatabase[req.params.id].address = req.body.longURL;
 
-
-  // else {
-  // urlDatabase[req.params.id] = req.body.longURL
-  // }
   res.redirect("/urls")
 });
 
