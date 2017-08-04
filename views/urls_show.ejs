@@ -12,7 +12,7 @@
 
  <h3>List of Urls:</h3>
 <ul>
-   <li><%= shortURL %> - <%= longURL %></li>
+   <li><%= shortURL %> - <%= urls[shortURL].address %></li>
 </ul>
 
 <form action="/urls/<%= shortURL %>" method="POST" style="margin:150px;">

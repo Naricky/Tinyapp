@@ -1,0 +1,21 @@
+{
+  "name": "ricky",
+  "version": "1.0.0",
+  "description": "practice",
+  "main": "index.js",
+  "scripts": {
+    "test": "practice , ricky ,index"
+  },
+  "author": "ricky",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^1.0.2",
+    "body-parser": "^1.17.2",
+    "chalk": "^2.0.1",
+    "ejs": "^2.5.7",
+    "express": "^4.15.3",
+    "cookie-session": "^1.3.0"
+  },
+  "devDependencies": {},
+  "keywords": []
+}

@@ -2,6 +2,7 @@ var express = require("express");
 var app = express();
 var PORT = process.env.PORT || 8080;
 
+
 var urlDatabase = {
  "b2xVn2": {
     address: "http://www.lighthouselabs.ca",
@@ -43,8 +44,17 @@ function generateRandomString() {
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 
-var cookieParser = require('cookie-parser');
-app.use(cookieParser());
+const bcrypt = require('bcrypt');
+
+var cookieSession = require('cookie-session')
+
+app.use(cookieSession({
+  name: 'session',
+  keys: ['secret'],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 
 app.set("view engine", "ejs");
 
@@ -59,21 +69,22 @@ function urlsForUserID(id){
 }
 
 app.get("/urls", (req, res) => {
- const userCookie = req.cookies['user_id'];
+
+ const userCookie = req.session['user_id'];
  var urls = urlsForUserID(userCookie)
  let templateVars = {
    urls: urls,
    user: users[userCookie]
  };
  // console.log(userCookie);
- console.log(urlsForUserID(req.cookies['user_id']))
+ console.log(urlsForUserID(req.session['user_id']))
  res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
 
-  let templateVars = { user:users[req.cookies["user_id"]] }
-  if (users.hasOwnProperty(req.cookies["user_id"])){
+  let templateVars = { user:users[req.session["user_id"]] }
+  if (users.hasOwnProperty(req.session["user_id"])){
     res.render("urls_new", templateVars);
   }
   else {
@@ -83,20 +94,20 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   var itemToLookup = req.params.id;
-  let templateVars = { shortURL: req.params.id, longURL: urlDatabase[itemToLookup], user:users[req.cookies["user_id"]] };
+  let templateVars = { shortURL: req.params.id, urls: urlDatabase, user:users[req.session["user_id"]] };
   res.render("urls_show", templateVars);
 });
 
 app.get("/", (req, res) => {
   let templateVars = {
-  user:users[req.cookies["user_id"]],
+  user:users[req.session["user_id"]],
 };
   res.end("Hello!", templateVars);
 });
 
 app.get("/urls.json", (req, res) => {
   let templateVars = {
-  user:users[req.cookies["user_id"]],
+  user:users[req.session["user_id"]],
 };
   res.json(urlDatabase);
 });
@@ -111,14 +122,14 @@ app.post("/urls", (req, res) => {
   var shortUrl = generateRandomString();
   urlDatabase[shortUrl] = {address:req.body.longURL,
                           shortURL: shortUrl,
-                          userID: req.cookies['user_id']}
+                          userID: req.session['user_id']}
   res.redirect('/urls');
 
 });
 
 app.post("/urls/:id/delete", (req, res) => {
     const shortURL = req.params.id;
-    if (urlDatabase[shortURL]["user_id"]= req.cookies["user_id"]){
+    if (urlDatabase[shortURL]["user_id"]= req.session["user_id"]){
       delete urlDatabase[req.params.id];
     res.redirect("/urls")
     }
@@ -130,7 +141,7 @@ app.post("/urls/:id/delete", (req, res) => {
 app.post("/urls/:id", (req, res) => {
   var longURL = urlDatabase[req.params.id].address;
   const shortURL = req.params.id
-  if(urlDatabase[shortURL]["user_id"] = req.cookies["user_id"]){
+  if(urlDatabase[shortURL]["user_id"] = req.session["user_id"]){
     urlDatabase[req.params.id].address = req.body.longURL;
     res.redirect('/urls');
   }
@@ -164,10 +175,12 @@ app.post("/register", (req,res) => {
     users[randStr] = {
       id: randStr,
       email: req.body.email,
-      password: req.body.password
+      password: bcrypt.hashSync(req.body.password, 10)
     }
   }
-  res.cookie("user_id" , users[randStr].id);
+
+
+  req.session.user_id = users[randStr].id
 
   res.redirect("/urls")
 
@@ -191,14 +204,14 @@ app.post("/login", (req, res) => {
   const user = findUser(email, password);
   console.log('User', user);
   if (!user) {
-    res.sendStatus(403)
+    res.sendStatus(403).send('User does not exist')
   }
   if (user) {
-    if(user.password === password) {
+    if(bcrypt.compareSync(password, user.password)) {
       res.cookie( "user_id" , user.id );
       res.redirect('/urls');
     } else {
-      res.status(403).send('Password')
+      res.status(403).send('Password does not exist')
     }
   }
 

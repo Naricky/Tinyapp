@@ -1,14 +1,8 @@
-function generateRandomString() {
+const bcrypt = require('bcrypt');
+const password = "purple-monkey-dinosaur"; // you will probably this from req.params
+const hashed_password = bcrypt.hashSync(password, 10);
 
-  var text = "";
+bcrypt.compareSync("purple-monkey-dinosaur", hashed_password); // returns true
 
-  var charset = "abcdefghijklmnopqrstuvwxyz0123456789";
-
-  for( var i=0; i < 6; i++ ) {
-    text += charset.charAt(Math.floor(Math.random() * charset.length));
-  }
-
-  return text;
-}
-
-console.log(generateRandomString())
+console.log(password);
+console.log(hashed_password)
