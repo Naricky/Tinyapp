@@ -5,11 +5,13 @@ var PORT = process.env.PORT || 8080;
 var urlDatabase = {
  "b2xVn2": {
     address: "http://www.lighthouselabs.ca",
-    shortURL: "userRandomID"
+    shortURL: "userRandomID",
+    owner: "userRandomID"
   },
  "9sm5xK": {
     address: "http://www.google.com",
-    shortURL: "user2RandomID"
+    shortURL: "user2RandomID",
+    owner: "user2RandomID"
   }
 }
 const users ={
@@ -93,21 +95,30 @@ app.post("/urls", (req, res) => {
 
   var shortUrl = generateRandomString();
   urlDatabase[shortUrl] = {address:req.body.longURL,
-                          shortURL: shortUrl}
+                          shortURL: shortUrl,
+                          userID: req.cookies['user_id']}
   res.redirect('/urls');
 
 });
 
 app.post("/urls/:id/delete", (req, res) => {
-
-  delete urlDatabase[req.params.id];
-
-  res.redirect("/urls")
+    const shortURL = req.params.id;
+    if (urlDatabase[shortURL]["user_id"]= req.cookies["user_id"]){
+      delete urlDatabase[req.params.id];
+    res.redirect("/urls")
+    }
+    else {
+    res.redirect("/urls")
+  }
 });
 
 app.post("/urls/:id", (req, res) => {
-
-  urlDatabase[req.params.id].address = req.body.longURL;
+  var longURL = urlDatabase[req.params.id].address;
+  const shortURL = req.params.id
+  if(urlDatabase[shortURL]["user_id"] = req.cookies["user_id"]){
+    urlDatabase[req.params.id].address = req.body.longURL;
+    res.redirect('/urls');
+  }
 
   res.redirect("/urls")
 });
@@ -171,7 +182,6 @@ app.post("/login", (req, res) => {
   if (!user) {
     res.sendStatus(403)
   }
-  // check if the found user's password is correct
   if (user) {
     if(user.password === password) {
       res.cookie( "user_id" , user.id );
