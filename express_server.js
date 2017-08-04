@@ -156,7 +156,7 @@ const findUser = email => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const user = findUser(email, password);
-  console.log('USER!!!!!!', user);
+  console.log('User', user);
   if (!user) {
     res.sendStatus(403)
   }
@@ -164,9 +164,9 @@ app.post("/login", (req, res) => {
   if (user) {
     if(user.password === password) {
       res.cookie( "user_id" , user.id );
-      res.redirect('/');
+      res.redirect('/urls');
     } else {
-      res.status(403).send("password was WRONG!!!!")
+      res.status(403).send('Password')
     }
   }
 
