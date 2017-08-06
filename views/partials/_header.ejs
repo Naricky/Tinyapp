@@ -1,5 +1,6 @@
 <h1> WEBSITE URL -  </h1>
 <% if (user) { %>
+    <h2><%= user['email']%></h2>
   <form method="POST" action=/logout>
     <button type="delete" >logout</button>
   </form>
