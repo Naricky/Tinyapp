@@ -2,15 +2,18 @@
 <html lang="en">
 <head>
 
- <title>TinyApp</title>
+  <title>TinyApp</title>
+
 </head>
+
 <body>
 
   <header>
         <% include ./partials/_header %>
-    </header>
+  </header>
 
- <h3>List of Urls:</h3>
+  <h3>List of Urls:</h3>
+
 <ul>
    <li><%= shortURL %> - <%= urls[shortURL].address %></li>
 </ul>
